@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.duyta.Travel_Vivu.dto.request.LoginRequest;
 import vn.duyta.Travel_Vivu.dto.response.LoginResponse;
+import vn.duyta.Travel_Vivu.dto.response.ResLoginDTO;
 import vn.duyta.Travel_Vivu.util.SecurityUtil;
 
 @Service
@@ -30,8 +31,8 @@ public class AuthService {
         // xác thực người dùng => cần viết hàm loadUserByUsername
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         String access_token = this.securityUtil.createToken(authentication);
-        return
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        ResLoginDTO resLoginDTO = new ResLoginDTO();
     }
 }
