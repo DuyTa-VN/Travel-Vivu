@@ -31,5 +31,7 @@ public class AuthService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        String access_token = this.securityUtil.createToken(authentication);
+        return
     }
 }
