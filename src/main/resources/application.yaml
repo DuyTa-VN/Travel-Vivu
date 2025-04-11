@@ -9,3 +9,7 @@ spring:
     hibernate:
       ddl-auto: update
 
+jwt:
+  secret-key: Hl+/PwGlMBbNMMOQKStYxRCroZ9dntF5xvwzKUz5ehhbORynapuzWhW+RE/h6qWPWgN24tK2qMwWie5S451gmQ==
+  #expired
+  token-validity-in-seconds: 86400
