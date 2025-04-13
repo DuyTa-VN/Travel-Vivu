@@ -49,6 +49,9 @@ public class AuthService {
         // tạo refresh token
         String refresh_token = this.securityUtil.createRefreshToken(request.getEmail(), res);
 
+        //update refresh token vào Database
+        this.userService.updateUserToken(refresh_token, request.getEmail());
+
         return LoginResponse.builder()
                 .accessToken(res.getAccessToken())
                 .userLogin(res.getUserLogin())

@@ -53,5 +53,15 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public void updateUserToken(String token, String email){
+        User currentUser = this.handleGetUserByUsername(email);
+        if (currentUser != null){
+            currentUser.setRefreshToken(token);
+            this.userRepository.save(currentUser);
+        } else {
+            log.error("User not found with email: {}", email);
+        }
+    }
+
 
 }

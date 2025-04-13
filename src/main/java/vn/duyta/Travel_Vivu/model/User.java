@@ -43,6 +43,9 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfile profile;
 
+    @Column(name = "refresh_token", columnDefinition = "MEDIUMTEXT")
+    private String refreshToken;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
