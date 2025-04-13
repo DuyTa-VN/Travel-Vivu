@@ -37,11 +37,15 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
+        final String[] PUBLIC_ENDPOINTS = {
+                "/", "/api/v1/auth/login"
+        };
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-
-                    .anyRequest().permitAll()
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint))
@@ -62,7 +66,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public JwtEncoder jwtEncoder(){
+    public JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(getSecretKey()));
     }
 
@@ -72,13 +76,13 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(){
+    public JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
                 getSecretKey()).macAlgorithm(SecurityUtil.JWT_ALGORITHM).build();
         return token -> {
-            try{
+            try {
                 return jwtDecoder.decode(token);
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println(">>> JWT Error: " + e.getMessage());
                 throw e;
             }
@@ -89,7 +93,7 @@ public class SecurityConfiguration {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("permission");
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("permissions");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);

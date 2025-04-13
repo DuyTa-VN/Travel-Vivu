@@ -2,6 +2,8 @@ package vn.duyta.Travel_Vivu.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -22,6 +24,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final SecurityUtil securityUtil;
 
+    @Value("${jwt.refresh-token-validity-in-seconds}")
+    private long refreshTokenExpiration;
+
     public LoginResponse login(LoginRequest request){
 
         //input gồm email và password
@@ -30,8 +35,7 @@ public class AuthService {
 
         // xác thực người dùng => cần viết hàm loadUserByUsername
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-        String access_token = this.securityUtil.createAccessToken(authentication);
+        // nếu xác thực thành công thì lưu thông tin vào SecurityContextHolder
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         LoginResponse res = new LoginResponse();
@@ -44,17 +48,31 @@ public class AuthService {
                     .build();
             res.setUserLogin(userLogin);
         }
+        String access_token = this.securityUtil.createAccessToken(authentication, res.getUserLogin());
         res.setAccessToken(access_token);
 
         // tạo refresh token
         String refresh_token = this.securityUtil.createRefreshToken(request.getEmail(), res);
-
         //update refresh token vào Database
         this.userService.updateUserToken(refresh_token, request.getEmail());
 
         return LoginResponse.builder()
                 .accessToken(res.getAccessToken())
                 .userLogin(res.getUserLogin())
+                .build();
+    }
+
+    public LoginResponse getAccount(){
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        User currentUserDB = this.userService.handleGetUserByUsername(email);
+        LoginResponse.UserLogin userLogin = new LoginResponse.UserLogin();
+        if (currentUserDB != null){
+            userLogin.setId(currentUserDB.getId());
+            userLogin.setEmail(currentUserDB.getEmail());
+            userLogin.setFullName(currentUserDB.getFullName());
+        }
+        return LoginResponse.builder()
+                .userLogin(userLogin)
                 .build();
     }
 }

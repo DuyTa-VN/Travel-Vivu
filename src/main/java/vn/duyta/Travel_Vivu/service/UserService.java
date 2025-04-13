@@ -24,7 +24,6 @@ public class UserService {
             log.error("Email already exists {}", request.getEmail());
             throw new IdInvalidException("Email " + request.getEmail() + " đã tồn tại, vui lòng sử dụng email khác");
         }
-
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))

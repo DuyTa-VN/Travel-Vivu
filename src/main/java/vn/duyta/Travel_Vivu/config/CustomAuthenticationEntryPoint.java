@@ -31,7 +31,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         this.delegate.commence(request, response, authException);
         response.setContentType("application/json;charset=UTF-8");
 
-        RestResponse<Object> res = new RestResponse<Object>();
+        RestResponse<Object> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
 
         String errorMessage = Optional.ofNullable(authException.getCause())
