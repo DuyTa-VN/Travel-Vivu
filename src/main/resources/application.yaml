@@ -12,4 +12,5 @@ spring:
 jwt:
   secret-key: Hl+/PwGlMBbNMMOQKStYxRCroZ9dntF5xvwzKUz5ehhbORynapuzWhW+RE/h6qWPWgN24tK2qMwWie5S451gmQ==
   #expired
-  token-validity-in-seconds: 86400
+  access-token-validity-in-seconds: 86400
+  refresh-token-validity-in-seconds: 86400

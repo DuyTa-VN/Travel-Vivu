@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.duyta.Travel_Vivu.dto.request.LoginRequest;
 import vn.duyta.Travel_Vivu.dto.response.LoginResponse;
-import vn.duyta.Travel_Vivu.dto.response.ResLoginDTO;
+import vn.duyta.Travel_Vivu.model.User;
 import vn.duyta.Travel_Vivu.util.SecurityUtil;
 
 @Service
@@ -31,8 +31,27 @@ public class AuthService {
         // xác thực người dùng => cần viết hàm loadUserByUsername
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        String access_token = this.securityUtil.createToken(authentication);
+        String access_token = this.securityUtil.createAccessToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        ResLoginDTO resLoginDTO = new ResLoginDTO();
+
+        LoginResponse res = new LoginResponse();
+        User currentUserDB = this.userService.handleGetUserByUsername(request.getEmail());
+        if (currentUserDB != null){
+            LoginResponse.UserLogin userLogin = LoginResponse.UserLogin.builder()
+                    .id(currentUserDB.getId())
+                    .email(currentUserDB.getEmail())
+                    .fullName(currentUserDB.getFullName())
+                    .build();
+            res.setUserLogin(userLogin);
+        }
+        res.setAccessToken(access_token);
+
+        // tạo refresh token
+        String refresh_token = this.securityUtil.createRefreshToken(request.getEmail(), res);
+
+        return LoginResponse.builder()
+                .accessToken(res.getAccessToken())
+                .userLogin(res.getUserLogin())
+                .build();
     }
 }

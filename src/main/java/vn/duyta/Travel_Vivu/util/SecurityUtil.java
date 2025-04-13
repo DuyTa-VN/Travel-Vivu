@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+import vn.duyta.Travel_Vivu.dto.response.LoginResponse;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -23,18 +24,37 @@ public class SecurityUtil {
     @Value("${jwt.secret-key}")
     private String jwtKey;
 
-    @Value("${jwt.token-validity-in-seconds}")
-    private long jwtExpiration;
+    @Value("${jwt.access-token-validity-in-seconds}")
+    private long accessTokenExpiration;
 
-    public String createToken(Authentication authentication){
+    @Value("${jwt.refresh-token-validity-in-seconds}")
+    private long refreshTokenExpiration;
+
+    public String createAccessToken(Authentication authentication){
         Instant now = Instant.now();
-        Instant validity = now.plus(this.jwtExpiration, ChronoUnit.SECONDS);
+        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(authentication.getName())
                 .issuedAt(now)
                 .expiresAt(validity)
-                .claim("duy", authentication)
+                .claim("user", authentication)
+                .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM)
+                .build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    public String createRefreshToken(String email, LoginResponse res){
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject(email)
+                .issuedAt(now)
+                .expiresAt(validity)
+                .claim("user", res.getUserLogin())
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM)
