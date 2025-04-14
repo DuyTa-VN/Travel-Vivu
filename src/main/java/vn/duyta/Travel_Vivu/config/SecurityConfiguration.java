@@ -38,7 +38,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         final String[] PUBLIC_ENDPOINTS = {
-                "/", "/api/v1/auth/login"
+                "/", "/api/v1/auth/login", "/api/v1/auth/refresh",
         };
 
         http
