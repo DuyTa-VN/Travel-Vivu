@@ -1,4 +1,4 @@
-package vn.duyta.Travel_Vivu.dto.response;
+package vn.duyta.Travel_Vivu.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,18 +6,13 @@ import lombok.Setter;
 import vn.duyta.Travel_Vivu.common.Gender;
 import vn.duyta.Travel_Vivu.common.Role;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
-public class UserCreationResponse {
-    private Long id;
+public class UserUpdateRequest {
     private String fullName;
-    private String email;
     private String phoneNumber;
     private Integer age;
     private Role role;
     private Gender gender;
-    private LocalDateTime createdAt;
 }

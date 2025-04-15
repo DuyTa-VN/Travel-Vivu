@@ -5,13 +5,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.duyta.Travel_Vivu.dto.request.UserCreationRequest;
+import vn.duyta.Travel_Vivu.dto.request.UserUpdateRequest;
 import vn.duyta.Travel_Vivu.dto.response.UserCreationResponse;
+import vn.duyta.Travel_Vivu.dto.response.UserUpdateResponse;
+import vn.duyta.Travel_Vivu.model.User;
 import vn.duyta.Travel_Vivu.service.UserService;
 import vn.duyta.Travel_Vivu.util.annotation.ApiMessage;
 import vn.duyta.Travel_Vivu.util.error.IdInvalidException;
@@ -27,7 +28,25 @@ public class UserController {
     @PostMapping
     @ApiMessage("Create a user")
     public ResponseEntity<UserCreationResponse> createUser(@Valid @RequestBody UserCreationRequest request) throws IdInvalidException {
+        log.info("Create user with email: {}", request.getEmail());
         UserCreationResponse res = this.userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    }
+
+    @PutMapping("/{id}")
+    @ApiMessage("Update a user")
+    public ResponseEntity<UserUpdateResponse> updateUser(@Valid @PathVariable("id") Long id,
+                                                         @RequestBody UserUpdateRequest request) throws IdInvalidException {
+        log.info("Update user with id: {}", id);
+        UserUpdateResponse res = this.userService.updateUser(id, request);
+        return ResponseEntity.ok().body(res);
+    }
+
+    @DeleteMapping("/{id}")
+    @ApiMessage("Delete a user")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) throws IdInvalidException {
+        log.info("Delete user with id: {}", id);
+        this.userService.handleDeleteUser(id);
+        return ResponseEntity.ok(null);
     }
 }

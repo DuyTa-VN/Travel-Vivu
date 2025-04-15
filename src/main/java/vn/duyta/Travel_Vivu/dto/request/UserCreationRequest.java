@@ -25,12 +25,12 @@ public class UserCreationRequest {
     @NotBlank(message = "PhoneNumber không được để trống")
     private String phoneNumber;
 
-   @NotNull(message = "Age không được để trống")
+    @NotNull(message = "Age không được để trống")
     private Integer age;
 
-   @NotNull(message = "Role không được để trống")
+    @NotNull(message = "Role không được để trống")
     private Role role;
 
-   @NotNull(message = "Gender không được để trống")
+    @NotNull(message = "Gender không được để trống")
     private Gender gender;
 }

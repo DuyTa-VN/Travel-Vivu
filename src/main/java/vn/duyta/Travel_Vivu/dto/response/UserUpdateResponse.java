@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class UserCreationResponse {
+public class UserUpdateResponse {
     private Long id;
     private String fullName;
     private String email;
@@ -19,5 +19,5 @@ public class UserCreationResponse {
     private Integer age;
     private Role role;
     private Gender gender;
-    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
