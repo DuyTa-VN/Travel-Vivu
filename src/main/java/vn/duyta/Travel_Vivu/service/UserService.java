@@ -15,7 +15,9 @@ import vn.duyta.Travel_Vivu.model.UserProfile;
 import vn.duyta.Travel_Vivu.repository.UserRepository;
 import vn.duyta.Travel_Vivu.util.error.IdInvalidException;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -96,6 +98,24 @@ public class UserService {
                 .build();
     }
 
+    // Lấy thông tin tất cả người dùng
+    public List<UserResponse> getAllUsers(){
+        List<User> users = this.userRepository.findAll();
+        return users.stream().map(user -> UserResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .age(user.getAge())
+                .role(user.getRole())
+                .gender(user.getGender())
+                .profile(user.getProfile())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build()).collect(Collectors.toList());
+    }
+
+    // Lấy thông tin người dùng theo ID
     public UserResponse fetchUserById(Long id) throws IdInvalidException {
         User user = this.userRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("User với id = " + id + " không tồn tại"));

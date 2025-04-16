@@ -18,6 +18,8 @@ import vn.duyta.Travel_Vivu.service.UserService;
 import vn.duyta.Travel_Vivu.util.annotation.ApiMessage;
 import vn.duyta.Travel_Vivu.util.error.IdInvalidException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -40,6 +42,14 @@ public class UserController {
                                                          @RequestBody UserUpdateRequest request) throws IdInvalidException {
         log.info("Update user with id: {}", id);
         UserUpdateResponse res = this.userService.updateUser(id, request);
+        return ResponseEntity.ok().body(res);
+    }
+
+    @GetMapping
+    @ApiMessage("Get all users")
+    public ResponseEntity<List<UserResponse>> fetchAllUsers() {
+        log.info("Fetch all users");
+        List<UserResponse> res = this.userService.getAllUsers();
         return ResponseEntity.ok().body(res);
     }
 
