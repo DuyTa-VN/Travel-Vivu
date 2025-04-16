@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.duyta.Travel_Vivu.dto.request.UserCreationRequest;
 import vn.duyta.Travel_Vivu.dto.request.UserUpdateRequest;
 import vn.duyta.Travel_Vivu.dto.response.UserCreationResponse;
+import vn.duyta.Travel_Vivu.dto.response.UserResponse;
 import vn.duyta.Travel_Vivu.dto.response.UserUpdateResponse;
 import vn.duyta.Travel_Vivu.model.User;
 import vn.duyta.Travel_Vivu.service.UserService;
@@ -39,6 +40,14 @@ public class UserController {
                                                          @RequestBody UserUpdateRequest request) throws IdInvalidException {
         log.info("Update user with id: {}", id);
         UserUpdateResponse res = this.userService.updateUser(id, request);
+        return ResponseEntity.ok().body(res);
+    }
+
+    @GetMapping("/{id}")
+    @ApiMessage("Get user by id")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable("id") Long id) throws IdInvalidException {
+        log.info("Fetch user with id: {}", id);
+        UserResponse res = this.userService.fetchUserById(id);
         return ResponseEntity.ok().body(res);
     }
 

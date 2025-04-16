@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class UserUpdateResponse {
+public class UserResponse {
     private Long id;
     private String fullName;
     private String email;
@@ -21,5 +21,6 @@ public class UserUpdateResponse {
     private Role role;
     private Gender gender;
     private UserProfile profile;
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

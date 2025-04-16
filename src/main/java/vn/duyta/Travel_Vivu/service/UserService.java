@@ -8,8 +8,10 @@ import vn.duyta.Travel_Vivu.common.Role;
 import vn.duyta.Travel_Vivu.dto.request.UserCreationRequest;
 import vn.duyta.Travel_Vivu.dto.request.UserUpdateRequest;
 import vn.duyta.Travel_Vivu.dto.response.UserCreationResponse;
+import vn.duyta.Travel_Vivu.dto.response.UserResponse;
 import vn.duyta.Travel_Vivu.dto.response.UserUpdateResponse;
 import vn.duyta.Travel_Vivu.model.User;
+import vn.duyta.Travel_Vivu.model.UserProfile;
 import vn.duyta.Travel_Vivu.repository.UserRepository;
 import vn.duyta.Travel_Vivu.util.error.IdInvalidException;
 
@@ -21,11 +23,10 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     // tạo người dùng
     public UserCreationResponse createUser(UserCreationRequest request) throws IdInvalidException {
         log.info("User creation");
-        if (userRepository.existsByEmail(request.getEmail())){
+        if (userRepository.existsByEmail(request.getEmail())) {
             log.error("Email already exists {}", request.getEmail());
             throw new IdInvalidException("Email " + request.getEmail() + " đã tồn tại, vui lòng sử dụng email khác");
         }
@@ -53,21 +54,35 @@ public class UserService {
     }
 
     //Update user
-    public UserUpdateResponse updateUser(Long id, UserUpdateRequest request) throws IdInvalidException{
+    public UserUpdateResponse updateUser(Long id, UserUpdateRequest request) throws IdInvalidException {
         log.info("User update");
         User currentUser = this.userRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("User not found with id: " + id));
-        if (currentUser != null){
-            currentUser.setFullName(request.getFullName());
-            currentUser.setPhoneNumber(request.getPhoneNumber());
-            currentUser.setAge(request.getAge());
-            currentUser.setGender(request.getGender());
-            if (currentUser.getRole().equals(Role.ADMIN) && request.getRole() != null){
-                currentUser.setRole(request.getRole());
-            }
 
-            currentUser = this.userRepository.save(currentUser);
+        currentUser.setFullName(request.getFullName());
+        currentUser.setPhoneNumber(request.getPhoneNumber());
+        currentUser.setAge(request.getAge());
+        currentUser.setGender(request.getGender());
+        if (currentUser.getRole().equals(Role.ADMIN) && request.getRole() != null) {
+            currentUser.setRole(request.getRole());
         }
+        currentUser = this.userRepository.save(currentUser);
+
+        UserProfile userProfile = currentUser.getProfile();
+        if (userProfile == null) {
+            userProfile = new UserProfile();
+            userProfile.setUser(currentUser);
+        }
+        if (request.getProfile() != null){
+            userProfile.setAvatarUrl(request.getProfile().getAvatarUrl());
+            userProfile.setDateOfBirth(request.getProfile().getDateOfBirth());
+            userProfile.setAddress(request.getProfile().getAddress());
+        }
+        currentUser.setProfile(userProfile);
+
+        // save user và userProfile
+        this.userRepository.save(currentUser);
+
         return UserUpdateResponse.builder()
                 .id(currentUser.getId())
                 .fullName(currentUser.getFullName())
@@ -76,20 +91,29 @@ public class UserService {
                 .age(currentUser.getAge())
                 .role(currentUser.getRole())
                 .gender(currentUser.getGender())
+                .profile(currentUser.getProfile())
                 .updatedAt(currentUser.getUpdatedAt())
                 .build();
     }
 
-    public User fetchUserById(Long id){
-        Optional<User> userOptional = this.userRepository.findById(id);
-        if (userOptional.isPresent()){
-            return userOptional.get();
-        } else {
-            log.error("User not found with id: {}", id);
-            return null;
-        }
+    public UserResponse fetchUserById(Long id) throws IdInvalidException {
+        User user = this.userRepository.findById(id)
+                .orElseThrow(() -> new IdInvalidException("User với id = " + id + " không tồn tại"));
+        return UserResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .age(user.getAge())
+                .role(user.getRole())
+                .gender(user.getGender())
+                .profile(user.getProfile())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
     }
 
+    // Xóa người dùng
     public void handleDeleteUser(Long id) throws IdInvalidException {
         User currentUser = this.userRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("User với id = " + id + " không tồn tại"));
@@ -100,9 +124,9 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public void updateUserToken(String token, String email){
+    public void updateUserToken(String token, String email) {
         User currentUser = this.handleGetUserByUsername(email);
-        if (currentUser != null){
+        if (currentUser != null) {
             currentUser.setRefreshToken(token);
             this.userRepository.save(currentUser);
         } else {

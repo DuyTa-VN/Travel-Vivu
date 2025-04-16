@@ -1,10 +1,9 @@
 package vn.duyta.Travel_Vivu.dto.request;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import vn.duyta.Travel_Vivu.common.Gender;
 import vn.duyta.Travel_Vivu.common.Role;
+import vn.duyta.Travel_Vivu.model.UserProfile;
 
 @Getter
 @Setter
@@ -15,4 +14,5 @@ public class UserUpdateRequest {
     private Integer age;
     private Role role;
     private Gender gender;
+    private UserProfile profile;
 }
