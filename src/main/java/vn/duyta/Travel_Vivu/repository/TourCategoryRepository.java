@@ -6,4 +6,5 @@ import vn.duyta.Travel_Vivu.model.TourCategory;
 
 @Repository
 public interface TourCategoryRepository extends JpaRepository<TourCategory, Long> {
+    boolean existsByName(String name);
 }

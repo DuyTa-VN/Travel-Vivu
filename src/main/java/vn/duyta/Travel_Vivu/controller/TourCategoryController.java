@@ -18,25 +18,25 @@ public class TourCategoryController {
 
     @PostMapping
     public ResponseEntity<TourCategory> createTourCategory(TourCategory tourCategory) throws IdInvalidException {
-        TourCategory createdCategory = tourCategoryService.createTourCategory(tourCategory);
+        TourCategory createdCategory = this.tourCategoryService.createTourCategory(tourCategory);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
     @GetMapping
     public ResponseEntity<List<TourCategory>> fetchAllTourCategories() {
-        List<TourCategory> categories = tourCategoryService.getAllTourCategories();
+        List<TourCategory> categories = this.tourCategoryService.getAllTourCategories();
         return ResponseEntity.ok(categories);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TourCategory> fetchTourCategoryById(Long id) throws IdInvalidException {
-        TourCategory category = tourCategoryService.getTourCategoryById(id);
+        TourCategory category = this.tourCategoryService.getTourCategoryById(id);
         return ResponseEntity.ok(category);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TourCategory> updateTourCategory(@PathVariable Long id, @RequestBody TourCategory tourCategory) throws IdInvalidException {
-        TourCategory updatedCategory = tourCategoryService.updateTourCategory(id, tourCategory);
+        TourCategory updatedCategory = this.tourCategoryService.updateTourCategory(id, tourCategory);
         return ResponseEntity.ok(updatedCategory);
     }
 

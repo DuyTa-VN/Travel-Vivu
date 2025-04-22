@@ -34,8 +34,16 @@ public class TourCategoryService {
         log.info("Tạo danh mục tour mới");
         // Kiểm tra quyền của người dùng
         checkAdminRole();
-        if (tourCategory.getName() == null || tourCategory.getName().isEmpty()) {
+        String tourCategoryName = tourCategory.getName();
+        if (tourCategoryName == null || tourCategoryName.isEmpty()) {
             throw new IdInvalidException("Tên danh mục không được để trống");
+        }
+        // chuẩn hóa tên danh mục
+        tourCategoryName = tourCategoryName.trim();
+        tourCategory.setName(tourCategoryName);
+
+        if (tourCategoryRepository.existsByName(tourCategoryName)) {
+            throw new IdInvalidException("Danh mục Tour " + tourCategoryName + " đã tồn tại");
         }
         return tourCategoryRepository.save(tourCategory);
     }
