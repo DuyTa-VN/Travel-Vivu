@@ -38,7 +38,10 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         final String[] PUBLIC_ENDPOINTS = {
-                "/", "/api/v1/auth/login", "/api/v1/auth/refresh",
+                "/",
+                "/api/v1/auth/register",
+                "/api/v1/auth/login",
+                "/api/v1/auth/refresh",
                 "/api/v1/tours",
         };
 
@@ -91,8 +94,8 @@ public class SecurityConfiguration {
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("permissions");
+        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);

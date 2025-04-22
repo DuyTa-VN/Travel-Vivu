@@ -38,12 +38,15 @@ public class SecurityUtil {
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
+        String role = String.valueOf(res.getUserLogin().getRole());
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(email)
                 .issuedAt(now)
                 .expiresAt(validity)
                 .claim("user", res.getUserLogin())
 //                .claim("permissions", res.getRole())
+                .claim("roles", role)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM)
@@ -54,6 +57,7 @@ public class SecurityUtil {
     public String createRefreshToken(String email, LoginResponse res){
         Instant now = Instant.now();
         Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+        String role = String.valueOf(res.getUserLogin().getRole());
 
         LoginResponse.UserInsideToken userToken = new LoginResponse.UserInsideToken();
         userToken.setId(res.getUserLogin().getId());
@@ -65,6 +69,7 @@ public class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .claim("user", userToken)
+                .claim("roles", role)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM)

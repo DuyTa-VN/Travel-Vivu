@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,9 +15,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import vn.duyta.Travel_Vivu.common.Role;
 import vn.duyta.Travel_Vivu.dto.request.LoginRequest;
+import vn.duyta.Travel_Vivu.dto.request.RegisterRequest;
 import vn.duyta.Travel_Vivu.dto.response.LoginResponse;
+import vn.duyta.Travel_Vivu.dto.response.UserCreationResponse;
 import vn.duyta.Travel_Vivu.model.User;
+import vn.duyta.Travel_Vivu.repository.UserRepository;
 import vn.duyta.Travel_Vivu.service.UserService;
 import vn.duyta.Travel_Vivu.util.SecurityUtil;
 import vn.duyta.Travel_Vivu.util.annotation.ApiMessage;
@@ -32,9 +37,43 @@ public class AuthController {
     private final SecurityUtil securityUtil;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @Value("${jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
+
+    @PostMapping("/register")
+    public ResponseEntity<UserCreationResponse> register(@Valid @RequestBody RegisterRequest request) throws IdInvalidException{
+        log.info("Registering new user with email: {}", request.getEmail());
+        boolean isEmailExist = this.userService.checkEmailExist(request.getEmail());
+        if (isEmailExist) {
+            throw new IdInvalidException("Email " + request.getEmail() + " đã tồn tại, vui lòng sử dụng email khác!");
+        }
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .fullName(request.getFullName())
+                .phoneNumber(request.getPhoneNumber())
+                .age(request.getAge())
+                .gender(request.getGender())
+                .role(Role.CUSTOMER)
+                .build();
+
+        user = this.userRepository.save(user);
+
+        // trả về response
+        UserCreationResponse response = UserCreationResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .age(user.getAge())
+                .role(user.getRole())
+                .gender(user.getGender())
+                .createdAt(user.getCreatedAt())
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
     @PostMapping("/login")
     @ApiMessage("Login")

@@ -1,5 +1,6 @@
 package vn.duyta.Travel_Vivu.service;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -61,7 +62,7 @@ public class UserService {
     public UserUpdateResponse updateUser(Long id, UserUpdateRequest request) throws IdInvalidException {
         log.info("User update");
         User currentUser = this.userRepository.findById(id)
-                .orElseThrow(() -> new IdInvalidException("User not found with id: " + id));
+                .orElseThrow(() -> new IdInvalidException("User không được tìm thấy với id: " + id));
 
         currentUser.setFullName(request.getFullName());
         currentUser.setPhoneNumber(request.getPhoneNumber());
@@ -167,4 +168,7 @@ public class UserService {
         return userRepository.findByRefreshTokenAndEmail(token, email);
     }
 
+    public boolean checkEmailExist(String email) {
+        return this.userRepository.existsByEmail(email);
+    }
 }
