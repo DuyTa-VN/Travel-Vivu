@@ -2,6 +2,8 @@ package vn.duyta.Travel_Vivu.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.duyta.Travel_Vivu.common.Role;
@@ -38,7 +40,7 @@ public class UserService {
                 .fullName(request.getFullName())
                 .phoneNumber(request.getPhoneNumber())
                 .age(request.getAge())
-                .role(request.getRole() != null ? request.getRole() : Role.CUSTOMER)
+                .role(Role.CUSTOMER)
                 .gender(request.getGender())
                 .build();
 
@@ -65,8 +67,15 @@ public class UserService {
         currentUser.setPhoneNumber(request.getPhoneNumber());
         currentUser.setAge(request.getAge());
         currentUser.setGender(request.getGender());
-        if (currentUser.getRole().equals(Role.ADMIN) && request.getRole() != null) {
-            currentUser.setRole(request.getRole());
+        if (request.getRole() != null) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+            if (isAdmin) {
+                currentUser.setRole(request.getRole());
+            } else {
+                throw new IdInvalidException("Bạn không có quyền thay đổi role của người dùng");
+            }
         }
         currentUser = this.userRepository.save(currentUser);
 
