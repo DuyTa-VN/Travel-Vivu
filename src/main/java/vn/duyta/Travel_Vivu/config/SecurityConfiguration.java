@@ -39,6 +39,7 @@ public class SecurityConfiguration {
                                            CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         final String[] PUBLIC_ENDPOINTS = {
                 "/", "/api/v1/auth/login", "/api/v1/auth/refresh",
+                "/api/v1/tours",
         };
 
         http
@@ -55,8 +56,6 @@ public class SecurityConfiguration {
 
                 .formLogin(AbstractAuthenticationFilterConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-
         return http.build();
     }
 
