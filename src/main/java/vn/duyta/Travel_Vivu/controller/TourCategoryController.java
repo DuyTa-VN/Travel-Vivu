@@ -1,5 +1,6 @@
 package vn.duyta.Travel_Vivu.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class TourCategoryController {
     private final TourCategoryService tourCategoryService;
 
     @PostMapping
-    public ResponseEntity<TourCategory> createTourCategory(TourCategory tourCategory) throws IdInvalidException {
+    public ResponseEntity<TourCategory> createTourCategory(@Valid @RequestBody TourCategory tourCategory) throws IdInvalidException {
         TourCategory createdCategory = this.tourCategoryService.createTourCategory(tourCategory);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
