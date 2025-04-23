@@ -14,3 +14,8 @@ jwt:
   #expired
   access-token-validity-in-seconds: 86400
   refresh-token-validity-in-seconds: 86400
+
+cloudinary:
+  cloud-name: dmg5diqpu
+  api-key: 521613263982321
+  api-secret: _caIK7uOu5Irut-hB_5wfTDHk2Y
