@@ -30,7 +30,7 @@ public class TourCategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TourCategory> fetchTourCategoryById(Long id) throws IdInvalidException {
+    public ResponseEntity<TourCategory> fetchTourCategoryById(@PathVariable Long id) throws IdInvalidException {
         TourCategory category = this.tourCategoryService.getTourCategoryById(id);
         return ResponseEntity.ok(category);
     }
