@@ -12,7 +12,6 @@ import vn.duyta.Travel_Vivu.repository.TourRepository;
 import vn.duyta.Travel_Vivu.util.error.IdInvalidException;
 
 import java.io.IOException;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,17 +20,16 @@ public class TourImageService {
     private final TourRepository tourRepository;
     private final TourImageRepository tourImageRepository;
 
-    public TourImage uploadImage(Long tourId ,MultipartFile file) throws IdInvalidException {
+    public TourImage  uploadImage(Long tourId ,MultipartFile file) throws IdInvalidException {
         try{
             //tìm tour theo id
             Tour tour = this.tourRepository.findById(tourId)
-                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy tour"));
+                    .orElseThrow(() -> new IdInvalidException("Tour với id = " + tourId + " không tồn tại"));
 
             //Upload ảnh lên Cloudinary
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+            var uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
                     "folder", "tours", // thư mục trong Cloudinary
                     "resource_type", "auto"));
-
             // lấy secure_url
             String imageUrl = uploadResult.get("secure_url").toString();
 
