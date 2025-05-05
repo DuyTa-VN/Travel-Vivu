@@ -1,7 +1,7 @@
 package vn.duyta.Travel_Vivu.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import vn.duyta.Travel_Vivu.common.BookingStatus;
 
 import java.math.BigDecimal;
@@ -9,7 +9,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
