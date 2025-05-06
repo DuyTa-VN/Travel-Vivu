@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import vn.duyta.Travel_Vivu.common.BookingStatus;
 import vn.duyta.Travel_Vivu.config.AuthenticationFacade;
 import vn.duyta.Travel_Vivu.dto.request.BookingRequest;
+import vn.duyta.Travel_Vivu.dto.request.UpdateBookingStatusRequest;
 import vn.duyta.Travel_Vivu.dto.response.BookingResponse;
 import vn.duyta.Travel_Vivu.model.Booking;
 import vn.duyta.Travel_Vivu.model.Tour;
@@ -58,10 +59,10 @@ public class BookingService {
     }
 
     // ADMIN Cập nhật trạng thái Booking
-    public BookingResponse updateBookingStatus(Long bookingId, BookingStatus status) throws IdInvalidException{
+    public BookingResponse updateBookingStatus(Long bookingId, UpdateBookingStatusRequest request) throws IdInvalidException{
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IdInvalidException("Booking có id = " + bookingId + " không tồn tại"));
-        booking.setStatus(status);
+        booking.setStatus(request.getStatus());
         return mapToResponse(bookingRepository.save(booking));
     }
 
