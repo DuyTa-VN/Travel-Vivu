@@ -36,7 +36,6 @@ public class BookingController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     @ApiMessage("Xem tất cả booking")
     public ResponseEntity<List<BookingResponse>> getAllBookings() {
@@ -44,7 +43,6 @@ public class BookingController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/status/{id}")
     @ApiMessage("Thay đổi trạng thái booking")
     public ResponseEntity<BookingResponse> updateStatus(@PathVariable Long id, @RequestBody UpdateBookingStatusRequest request) throws IdInvalidException {
@@ -52,7 +50,6 @@ public class BookingController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/cancel/{id}")
     @ApiMessage("Hủy booking")
     public ResponseEntity<BookingResponse> cancelBooking(@PathVariable Long id) throws IdInvalidException {

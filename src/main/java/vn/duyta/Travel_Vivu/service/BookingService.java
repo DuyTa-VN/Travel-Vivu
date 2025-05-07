@@ -2,6 +2,7 @@ package vn.duyta.Travel_Vivu.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import vn.duyta.Travel_Vivu.common.BookingStatus;
 import vn.duyta.Travel_Vivu.config.AuthenticationFacade;
@@ -51,6 +52,7 @@ public class BookingService {
     }
 
     // ADMIN xem tất cả Booking
+    @PreAuthorize("hasRole('ADMIN')")
     public List<BookingResponse> getAllBookings() {
         return bookingRepository.findAll()
                 .stream()
@@ -59,6 +61,7 @@ public class BookingService {
     }
 
     // ADMIN Cập nhật trạng thái Booking
+    @PreAuthorize("hasRole('ADMIN')")
     public BookingResponse updateBookingStatus(Long bookingId, UpdateBookingStatusRequest request) throws IdInvalidException{
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IdInvalidException("Booking có id = " + bookingId + " không tồn tại"));
