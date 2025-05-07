@@ -88,6 +88,7 @@ public class BookingService {
     }
 
     // xem chi tiết Booking
+    @PreAuthorize("hasRole('ADMIN')")
     public BookingResponse getBookingById(Long bookingId) throws IdInvalidException {
         User user = authenticationFacade.getCurrentUser();
         Booking booking = bookingRepository.findById(bookingId)

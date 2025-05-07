@@ -1,14 +1,19 @@
 package vn.duyta.Travel_Vivu.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import vn.duyta.Travel_Vivu.common.PaymentStatus;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payments")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,4 +35,17 @@ public class Payment {
     @OneToOne
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

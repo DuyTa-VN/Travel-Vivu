@@ -38,7 +38,8 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-                                           CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
+                                           CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+                                           CustomAccessDeniedHandler customAccessDeniedHandler) throws Exception {
         final String[] PUBLIC_ENDPOINTS = {
                 "/",
                 "/api/v1/auth/register",
@@ -58,7 +59,7 @@ public class SecurityConfiguration {
                         .authenticationEntryPoint(customAuthenticationEntryPoint))
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) // 401
-                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) //403
+                        .accessDeniedHandler(customAccessDeniedHandler)) //403
 
                 .formLogin(AbstractAuthenticationFilterConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
