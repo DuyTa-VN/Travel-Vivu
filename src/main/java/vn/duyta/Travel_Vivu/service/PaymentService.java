@@ -3,22 +3,26 @@ package vn.duyta.Travel_Vivu.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.duyta.Travel_Vivu.common.PaymentStatus;
+import vn.duyta.Travel_Vivu.config.AuthenticationFacade;
 import vn.duyta.Travel_Vivu.dto.request.PaymentRequest;
 import vn.duyta.Travel_Vivu.dto.request.UpdatePaymentStatusRequest;
 import vn.duyta.Travel_Vivu.dto.response.PaymentResponse;
 import vn.duyta.Travel_Vivu.model.Booking;
 import vn.duyta.Travel_Vivu.model.Payment;
+import vn.duyta.Travel_Vivu.model.User;
 import vn.duyta.Travel_Vivu.repository.BookingRepository;
 import vn.duyta.Travel_Vivu.repository.PaymentRepository;
 import vn.duyta.Travel_Vivu.util.error.IdInvalidException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
+    private final AuthenticationFacade authenticationFacade;
 
     public PaymentResponse createPayment(PaymentRequest request) throws IdInvalidException {
         Booking booking = this.bookingRepository.findById(request.getBookingId())
@@ -47,6 +51,7 @@ public class PaymentService {
         payment.setStatus(request.getStatus());
         return mapToResponse(this.paymentRepository.save(payment));
     }
+
 
     private PaymentResponse mapToResponse(Payment payment) {
         return PaymentResponse.builder()
