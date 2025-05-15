@@ -9,6 +9,10 @@ spring:
     hibernate:
       ddl-auto: update
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
 jwt:
   secret-key: Hl+/PwGlMBbNMMOQKStYxRCroZ9dntF5xvwzKUz5ehhbORynapuzWhW+RE/h6qWPWgN24tK2qMwWie5S451gmQ==
   #expired

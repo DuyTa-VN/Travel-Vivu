@@ -7,12 +7,13 @@ import vn.duyta.Travel_Vivu.common.Gender;
 import vn.duyta.Travel_Vivu.common.Role;
 import vn.duyta.Travel_Vivu.model.UserProfile;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
-public class UserResponse {
+public class UserResponse implements Serializable {
     private Long id;
     private String fullName;
     private String email;

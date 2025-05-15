@@ -3,6 +3,7 @@ package vn.duyta.Travel_Vivu.service;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -126,7 +127,9 @@ public class UserService {
     }
 
     // Lấy thông tin người dùng theo ID
+    @Cacheable(value = "user", key = "#id")
     public UserResponse fetchUserById(Long id) throws IdInvalidException {
+        log.info("Fetching user from DB with id: {}", id);
         User user = this.userRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("User với id = " + id + " không tồn tại"));
         return UserResponse.builder()
