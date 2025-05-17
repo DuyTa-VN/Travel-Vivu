@@ -17,6 +17,7 @@ import vn.duyta.Travel_Vivu.util.error.IdInvalidException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class TourService {
     private final TourRepository tourRepository;
     private final TourCategoryRepository tourCategoryRepository;
     private final AuthenticationFacade authenticationFacade;
-    private final TourImageService tourImageService;
+    private final RedisService redisService;
 
     // Tạo TOUR
     public TourResponse createTour(TourRequest request) throws IdInvalidException {
@@ -62,7 +63,7 @@ public class TourService {
     }
 
     // Cập nhật TOUR
-    public TourResponse updateTour(Long id, TourRequest request) throws IdInvalidException{
+    public TourResponse updateTour(Long id, TourRequest request) throws IdInvalidException {
         User currentUser = authenticationFacade.getCurrentUser();
         // kiểm tra role
         checkUserRole(currentUser);
@@ -74,6 +75,7 @@ public class TourService {
         tour.setPrice(request.getPrice());
         tour.setCategory(tourCategory);
         Tour updated = this.tourRepository.save(tour);
+        redisService.delete("Xóa tour với id = " + id + " trong Redis Cache");
         log.info("Tour đã được cập nhật với ID: {}", updated.getId());
         List<String> imageUrls = tour.getImages() != null
                 ? tour.getImages().stream().map(TourImage::getImageUrl).toList()
@@ -93,9 +95,16 @@ public class TourService {
     // Chi tiết tour
     public TourResponse getTourById(Long id) throws IdInvalidException {
         log.info("Lấy thông tin tour với ID: {}", id);
+
+        String redisKey = "tour:" + id;
+        Object cachedTour = redisService.get(redisKey);
+        if (cachedTour instanceof TourResponse tourResponse) {
+            log.info("Lấy thông tin tour từ Redis Cache với ID: {}", id);
+            return tourResponse;
+        }
         Tour tour = this.tourRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("Tour với id = " + id + " không tồn tại"));
-        return TourResponse.builder()
+        TourResponse response = TourResponse.builder()
                 .id(tour.getId())
                 .title(tour.getTitle())
                 .description(tour.getDescription())
@@ -106,11 +115,20 @@ public class TourService {
                 .imageUrls(tour.getImages().stream()
                         .map(TourImage::getImageUrl).toList())
                 .build();
+        redisService.save(redisKey, response, 10, TimeUnit.MINUTES);
+        return response;
     }
 
     //Danh sách tour
     public List<TourResponse> getAllTours() {
-        return tourRepository.findAll().stream()
+        String redisKey = "tour:all";
+        Object cached = this.redisService.get(redisKey);
+        if (cached instanceof List<?> cachedTours && !cachedTours.isEmpty() && cachedTours.getFirst() instanceof TourResponse) {
+            log.info("Lấy danh sách tour từ Redis Cache");
+            return (List<TourResponse>) cachedTours;
+        }
+
+        List<TourResponse> tours = tourRepository.findAll().stream()
                 .map(tour -> TourResponse.builder()
                         .id(tour.getId())
                         .title(tour.getTitle())
@@ -123,6 +141,8 @@ public class TourService {
                                 .map(TourImage::getImageUrl).toList())
                         .build())
                 .toList();
+        redisService.save(redisKey, tours, 10, TimeUnit.MINUTES);
+        return tours;
     }
 
     // Xoá tour
@@ -135,6 +155,7 @@ public class TourService {
         // Kiểm tra xem tour có tồn tại không
         Tour tour = this.tourRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("Tour có id = " + id + " không tồn tại"));
+        redisService.delete("Xóa tour với id = " + id + " trong Redis Cache");
         this.tourRepository.delete(tour);
     }
 
