@@ -46,4 +46,11 @@ public class TourController {
         this.tourService.deleteTour(id);
         return ResponseEntity.ok().body(null);
     }
+
+    @PutMapping("/{id}")
+    @ApiMessage("Cập nhật tour")
+    public ResponseEntity<TourResponse> update(@PathVariable Long id, @Valid @RequestBody TourRequest request) throws IdInvalidException {
+        TourResponse tourResponse = this.tourService.updateTour(id, request);
+        return ResponseEntity.ok().body(tourResponse);
+    }
 }
